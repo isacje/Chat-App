@@ -1,6 +1,5 @@
 {
   "name": "chat-app",
-  "homepage": "https://isacje.github.io/Chat-App/",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -9,13 +8,10 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
-    "predeploy": "npm run build && npm run lint",
-    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.52.1",
     "@tailwindcss/vite": "^4.1.11",
-    "gh-pages": "^6.3.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },

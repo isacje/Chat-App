@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { supabase } from '../supabaseClient'
 
 // Generate subtle pastel color from string
@@ -121,23 +121,23 @@ function App() {
   }, [session])
 
   // Helper function to clear typing timeout for a user (received events)
-  const clearTypingTimeout = (userId) => {
+  const clearTypingTimeout = useCallback((userId) => {
     const timeout = typingTimeoutsRef.current.get(userId)
     if (timeout) {
       clearTimeout(timeout)
       typingTimeoutsRef.current.delete(userId)
     }
-  }
+  }, [])
 
   // Helper function to remove typing user
-  const removeTypingUser = (userId) => {
+  const removeTypingUser = useCallback((userId) => {
     setTypingUsers((prev) => {
       const newMap = new Map(prev)
       newMap.delete(userId)
       return newMap
     })
     clearTypingTimeout(userId)
-  }
+  }, [clearTypingTimeout])
 
   // Realtime subscription - separate effect for better reliability
   useEffect(() => {
@@ -146,8 +146,9 @@ function App() {
       setTypingUsers(new Map())
       roomOneRef.current = null
       // Clear all typing timeouts for received events
-      typingTimeoutsRef.current.forEach(timeout => clearTimeout(timeout))
-      typingTimeoutsRef.current.clear()
+      const currentTimeouts = typingTimeoutsRef.current
+      currentTimeouts.forEach(timeout => clearTimeout(timeout))
+      currentTimeouts.clear()
       // Clear sender-side typing timeout
       if (sendTypingTimeoutRef.current) {
         clearTimeout(sendTypingTimeoutRef.current);
@@ -291,8 +292,9 @@ function App() {
       }
       
       // Clear all timeouts for received typing indicators
-      typingTimeoutsRef.current.forEach(timeout => clearTimeout(timeout))
-      typingTimeoutsRef.current.clear()
+      const currentTimeouts = typingTimeoutsRef.current
+      currentTimeouts.forEach(timeout => clearTimeout(timeout))
+      currentTimeouts.clear()
       
       // Clear the debounced sending typing timeout
       if (sendTypingTimeoutRef.current) {
@@ -306,7 +308,7 @@ function App() {
       }
       roomOneRef.current = null // Clear the ref
     }
-  }, [session?.user?.id]) // Re-run effect if session user ID changes
+  }, [session?.user?.id, removeTypingUser, clearTypingTimeout]) // Added missing dependencies
 
   // Debounced handler for sending typing status (sender's side)
   const handleTyping = () => {
