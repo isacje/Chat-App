@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: process.env.VITE_BASE_PATH ||'/Chat-App',
+  base: '/', // Changed from '/Chat-App' to '/'
   plugins: [
     react(),
     tailwindcss(),
